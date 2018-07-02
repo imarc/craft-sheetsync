@@ -1,0 +1,42 @@
+{
+    "name": "imarc/csv-sync",
+    "description": "Allows you to import CSV files into Craft sections as entries.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "csv",
+        "import",
+        "sync"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Hamer [kh] <kevin@imarc.com>",
+            "homepage": "https://www.imarc.com/"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "imarc\\csvsync\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "CSV Sync",
+        "handle": "csv-sync",
+        "developer": "Imarc",
+        "developerUrl": "https://www.imarc.com",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "components": {
+            "syncService": "imarc\\csvsync\\services\\SyncService"
+        },
+        "class": "imarc\\csvsync\\CsvSync"
+    }
+}
