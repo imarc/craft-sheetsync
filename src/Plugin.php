@@ -12,18 +12,12 @@ namespace imarc\csvsync;
 
 use imarc\csvsync\services\SyncService as SyncServiceService;
 use imarc\csvsync\utilities\CsvSyncUtility as CsvSyncUtilityUtility;
-use imarc\csvsync\widgets\SyncStatus as SyncStatusWidget;
 use imarc\csvsync\models\Settings;
 
 use Craft;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
 use craft\console\Application as ConsoleApplication;
-use craft\web\UrlManager;
 use craft\services\Utilities;
-use craft\services\Dashboard;
 use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterUrlRulesEvent;
 
 use yii\base\Event;
 
@@ -83,30 +77,11 @@ class Plugin extends \craft\base\Plugin
     public function init()
     {
         parent::init();
-        self::$plugin = $this;
 
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'imarc\csvsync\console\controllers';
         }
-
-        // Register our site routes
-        Event::on(
-            UrlManager::class,
-            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
-                $event->rules['siteActionTrigger1'] = 'csv-sync/default';
-            }
-        );
-
-        // Register our CP routes
-        Event::on(
-            UrlManager::class,
-            UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
-                $event->rules['cpActionTrigger1'] = 'csv-sync/default/do-something';
-            }
-        );
 
         // Register our utilities
         Event::on(
@@ -114,26 +89,6 @@ class Plugin extends \craft\base\Plugin
             Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = CsvSyncUtilityUtility::class;
-            }
-        );
-
-        // Register our widgets
-        Event::on(
-            Dashboard::class,
-            Dashboard::EVENT_REGISTER_WIDGET_TYPES,
-            function (RegisterComponentTypesEvent $event) {
-                $event->types[] = SyncStatusWidget::class;
-            }
-        );
-
-        // Do something after we're installed
-        Event::on(
-            Plugins::class,
-            Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-            function (PluginEvent $event) {
-                if ($event->plugin === $this) {
-                    // We were just installed
-                }
             }
         );
 
