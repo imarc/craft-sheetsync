@@ -10,32 +10,14 @@
 
 namespace imarc\csvsync\console\controllers;
 
-use imarc\csvsync\CsvSync;
+use imarc\csvsync\Plugin;
 
 use Craft;
 use yii\console\Controller;
 use yii\helpers\Console;
 
 /**
- * Default Command
- *
- * The first line of this class docblock is displayed as the description
- * of the Console Command in ./craft help
- *
- * Craft can be invoked via commandline console by using the `./craft` command
- * from the project root.
- *
- * Console Commands are just controllers that are invoked to handle console
- * actions. The segment routing is plugin-name/controller-name/action-name
- *
- * The actionIndex() method is what is executed if no sub-commands are supplied, e.g.:
- *
- * ./craft csv-sync/default
- *
- * Actions must be in 'kebab-case' so actionDoSomething() maps to 'do-something',
- * and would be invoked via:
- *
- * ./craft csv-sync/default/do-something
+ * imarc/craft-csvsync
  *
  * @author    Kevin Hamer
  * @package   CsvSync
@@ -43,40 +25,64 @@ use yii\helpers\Console;
  */
 class DefaultController extends Controller
 {
+    /**
+     * Set the default action to 'sync' instead of 'index'.
+     */
+    public $defaultAction = 'sync';
+
+    /**
+     * @var string
+     *     The name of the sync to run, as configured in config/csvsync.php.
+     */
+    public $name = null;
+
+    /**
+     * @var string
+     *     The path and filename of a CSV file to import. If not specified,
+     * uses the default filename configured in config/csvsync.php for the
+     * current sync.
+     */
+    public $file = null;
+
+    /**
+     * This is how you specify the allowable options in Craft3/Yii2.
+     */
+    public function options($action)
+    {
+        switch ($action) {
+            case "sync":
+                return ["name", "file"];
+            default:
+                return [];
+        }
+    }
+
+
+
     // Public Methods
     // =========================================================================
 
     /**
-     * Handle csv-sync/default console commands
+     * Display help for imarc/craft-csvsync plugin.
      *
-     * The first line of this method docblock is displayed as the description
-     * of the Console Command in ./craft help
-     *
-     * @return mixed
      */
-    public function actionIndex()
+    public function actionHelp()
     {
-        $result = 'something';
+        $b = "\033[1m";
+        $d = "\033[0m";
+        $version = Plugin::getInstance()->getVersion();
 
-        echo "Welcome to the console DefaultController actionIndex() method\n";
-
-        return $result;
+        echo "CSV Sync - $version\n\n";
+        echo "    ${b}yiic csvsync --sync=NAME --file=FILENAME$d\n";
+        echo "        Runs the sync NAME using the file FILENAME.\n\n";
     }
 
     /**
-     * Handle csv-sync/default/do-something console commands
+     * Runs a pre-configured sync.
      *
-     * The first line of this method docblock is displayed as the description
-     * of the Console Command in ./craft help
-     *
-     * @return mixed
      */
-    public function actionDoSomething()
+    public function actionSync()
     {
-        $result = 'something';
-
-        echo "Welcome to the console DefaultController actionDoSomething() method\n";
-
-        return $result;
+        echo Plugin::getInstance()->syncService->sync($this->name, $this->file) . "\n";
     }
 }

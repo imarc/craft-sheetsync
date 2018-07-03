@@ -1,5 +1,5 @@
 {
-    "name": "imarc/csv-sync",
+    "name": "imarc/craft-csvsync",
     "description": "Allows you to import CSV files into Craft sections as entries.",
     "type": "craft-plugin",
     "version": "1.0.0",
@@ -37,6 +37,6 @@
         "components": {
             "syncService": "imarc\\csvsync\\services\\SyncService"
         },
-        "class": "imarc\\csvsync\\CsvSync"
+        "class": "imarc\\csvsync\\Plugin"
     }
 }
