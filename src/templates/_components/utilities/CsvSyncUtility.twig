@@ -1,0 +1,38 @@
+{% import "_includes/forms" as forms %}
+
+<h1>CSV Import</h1>
+
+<p>
+    From here, you can run any CSV sync that has been configured manually.
+</p>
+
+{% if craft.request.getParam('status') == 'success' %}
+    <p>
+        Success! Synchronization ran successfully.
+    </p>
+{% elseif craft.request.getParam('status') == 'error' %}
+    <p>
+        Something went wrong trying to parse that file.
+    </p>
+{% endif %}
+
+<form id="csv-import" class="utility" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="csv-sync/default/index">
+    {{ csrfInput() }}
+
+    {{ forms.selectfield({
+        label: "Select Sync"|t("csv-sync"),
+        name: "sync",
+        options: syncs,
+    }) }}
+
+    {{ forms.fileField({
+        label: "Override CSV File"|t("csv-sync"),
+        name: "filename",
+    }) }}
+
+    <div class="buttons">
+        <input type="submit" class="btn submit" value="{{ "Run Sync"|t("csv-sync") }}" />
+        <div class="utility-status"></div>
+    </div>
+</form>

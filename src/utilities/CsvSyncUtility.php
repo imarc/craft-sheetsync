@@ -10,7 +10,7 @@
 
 namespace imarc\csvsync\utilities;
 
-use imarc\csvsync\CsvSync;
+use imarc\csvsync\Plugin;
 use imarc\csvsync\assetbundles\csvsyncutilityutility\CsvSyncUtilityUtilityAsset;
 
 use Craft;
@@ -39,7 +39,7 @@ class CsvSyncUtility extends Utility
      */
     public static function displayName(): string
     {
-        return Craft::t('csv-sync', 'CsvSyncUtility');
+        return Craft::t('csv-sync', 'CSV Import');
     }
 
     /**
@@ -85,11 +85,10 @@ class CsvSyncUtility extends Utility
     {
         Craft::$app->getView()->registerAssetBundle(CsvSyncUtilityUtilityAsset::class);
 
-        $someVar = 'Have a nice day!';
         return Craft::$app->getView()->renderTemplate(
-            'csv-sync/_components/utilities/CsvSyncUtility_content',
+            'csv-sync/_components/utilities/CsvSyncUtility',
             [
-                'someVar' => $someVar
+                'syncs' => Plugin::getInstance()->syncService->listSyncs(),
             ]
         );
     }

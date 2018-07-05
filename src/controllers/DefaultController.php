@@ -10,10 +10,10 @@
 
 namespace imarc\csvsync\controllers;
 
-use imarc\csvsync\CsvSync;
-
 use Craft;
 use craft\web\Controller;
+use imarc\csvsync\Plugin;
+use craft\web\UploadedFile;
 
 /**
  * Default Controller
@@ -37,17 +37,6 @@ use craft\web\Controller;
  */
 class DefaultController extends Controller
 {
-
-    // Protected Properties
-    // =========================================================================
-
-    /**
-     * @var    bool|array Allows anonymous access to this controller's actions.
-     *         The actions must be in 'kebab-case'
-     * @access protected
-     */
-    protected $allowAnonymous = ['index', 'do-something'];
-
     // Public Methods
     // =========================================================================
 
@@ -59,21 +48,17 @@ class DefaultController extends Controller
      */
     public function actionIndex()
     {
-        $result = 'Welcome to the DefaultController actionIndex() method';
+        $filename = null;
+        $upload = UploadedFile::getInstanceByName('filename');
+        if ($upload) {
+            $filename = $upload->tempName;
+        }
 
-        return $result;
-    }
+        $status = Plugin::getInstance()->syncService->sync(
+            Craft::$app->request->getRequiredBodyParam('sync'),
+            $filename
+        );
 
-    /**
-     * Handle a request going to our plugin's actionDoSomething URL,
-     * e.g.: actions/csv-sync/default/do-something
-     *
-     * @return mixed
-     */
-    public function actionDoSomething()
-    {
-        $result = 'Welcome to the DefaultController actionDoSomething() method';
-
-        return $result;
+        Craft::$app->response->redirect("?status=$status");
     }
 }

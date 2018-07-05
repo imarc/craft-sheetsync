@@ -15,7 +15,6 @@ use craft\base\Component;
 use craft\elements\Entry;
 use craft\helpers\App;
 use craft\helpers\ElementHelper;
-use imarc\csvsync\CsvSync;
 use imarc\csvsync\Plugin;
 
 /**
@@ -33,6 +32,12 @@ use imarc\csvsync\Plugin;
  */
 class SyncService extends Component
 {
+    static public function listSyncs()
+    {
+        $syncs = array_keys(Plugin::getInstance()->settings->syncs);
+        return array_combine($syncs, $syncs);
+    }
+
     /**
      * Fetches config values. It'll look within the configuration for the
      * specific sync first, and if it doesn't find the key it'll look within
@@ -160,6 +165,11 @@ class SyncService extends Component
         $this->file = fopen($filename, "r");
         $this->headers = $this->getRow();
 
+
+        if (!$this->headers) {
+            return "error";
+        }
+
         while ($row = $this->getAssociativeRow()) {
 
             $attrs = [];
@@ -194,11 +204,6 @@ class SyncService extends Component
                 ->typeId($this->entry_type_id);
             $entry = $this->config('find')($query, $row)->one();
 
-            if (!$entry) {
-                var_dump($entry, $row);
-                die('entry is false?');
-            }
-
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
                 if (is_callable($definition)) {
@@ -208,5 +213,7 @@ class SyncService extends Component
 
             $this->updateEntry($entry, $attrs);
         }
+
+        return "success";
     }
 }

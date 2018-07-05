@@ -13,6 +13,7 @@ namespace imarc\csvsync;
 use imarc\csvsync\services\SyncService as SyncServiceService;
 use imarc\csvsync\utilities\CsvSyncUtility as CsvSyncUtilityUtility;
 use imarc\csvsync\models\Settings;
+use imarc\csvsync\controllers\DefaultController;
 
 use Craft;
 use craft\console\Application as ConsoleApplication;
@@ -39,17 +40,6 @@ use yii\base\Event;
  */
 class Plugin extends \craft\base\Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    /**
-     * Static property that is an instance of this plugin class so that it can be accessed via
-     * CsvSync::$plugin
-     *
-     * @var CsvSync
-     */
-    public static $plugin;
-
     // Public Properties
     // =========================================================================
 
@@ -60,13 +50,15 @@ class Plugin extends \craft\base\Plugin
      */
     public $schemaVersion = '1.0.0';
 
+
+    public $controllerMap = [
+        'sync' => DefaultController::class,
+    ];
+
     // Public Methods
     // =========================================================================
 
     /**
-     * Set our $plugin static property to this class so that it can be accessed via
-     * CsvSync::$plugin
-     *
      * Called after the plugin class is instantiated; do any one-time initialization
      * here such as hooks and events.
      *
@@ -81,6 +73,8 @@ class Plugin extends \craft\base\Plugin
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'imarc\csvsync\console\controllers';
+        } else {
+            $this->controllerNamespace = 'imarc\csvsync\controllers';
         }
 
         // Register our utilities
