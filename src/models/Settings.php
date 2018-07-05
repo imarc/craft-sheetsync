@@ -10,4 +10,5 @@ class Settings extends Model
     public $delimiter = ',';
     public $enclosure = '"';
     public $escape    = '\\';
+    public $syncs     = [];
 }

@@ -102,17 +102,17 @@ class Plugin extends \craft\base\Plugin
         );
     }
 
-    public function info(...$params)
+    static public function info(...$params)
     {
         Craft::info(sprintf(...$params), 'csv-sync');
     }
 
-    public function warning(...$params)
+    static public function warning(...$params)
     {
         Craft::warning(sprintf(...$params), 'csv-sync');
     }
 
-    public function error(...$params)
+    static public function error(...$params)
     {
         Craft::error(sprintf(...$params), 'csv-sync');
     }

@@ -10,11 +10,13 @@
 
 namespace imarc\csvsync\services;
 
-use imarc\csvsync\CsvSync;
-use imarc\csvsync\Plugin;
-
 use Craft;
 use craft\base\Component;
+use craft\elements\Entry;
+use craft\helpers\App;
+use craft\helpers\ElementHelper;
+use imarc\csvsync\CsvSync;
+use imarc\csvsync\Plugin;
 
 /**
  * SyncService Service
@@ -38,7 +40,7 @@ class SyncService extends Component
      */
     protected function config($key)
     {
-        return $this->config[$key] ?? Craft::$app->config->csvSync->{$key} ?? null;
+        return $this->config[$key] ?? Plugin::getInstance()->settings[$key] ?? null;
     }
 
 
@@ -79,12 +81,36 @@ class SyncService extends Component
     /**
      * Creates a new entry.
      */
-    protected function createEntry()
+    protected function createEntry($attrs)
     {
-        $entry = new EntryModel();
+        $entry = new Entry();
+        $entry->authorId = $this->config('authorId');
         $entry->sectionId = $this->section->id;
         $entry->typeId = $this->entry_type_id;
         $entry->enabled = true;
+
+        if (isset($attrs['title'])) {
+            $entry->title = $attrs['title'];
+            unset($attrs['title']);
+        }
+        $entry->setFieldValues($attrs);
+        $entry->slug = $this->createSlug($entry);
+
+        Craft::$app->elements->saveElement($entry);
+
+        return $entry;
+    }
+
+    protected function updateEntry($entry, $attrs)
+    {
+        if (isset($attrs['title'])) {
+            $entry->title = $attrs['title'];
+            unset($attrs['title']);
+        }
+        $entry->setFieldValues($attrs);
+        $entry->slug = $this->createSlug($entry);
+
+        Craft::$app->elements->saveElement($entry);
 
         return $entry;
     }
@@ -99,7 +125,7 @@ class SyncService extends Component
         if (is_callable($this->config('slug'))) {
             return ($this->config('slug'))($entry);
         } else {
-            return ElementHelper::createSlug($entry->getContent()->{$this->config('slug')});
+            return ElementHelper::createSlug($entry->{$this->config('slug')});
         }
     }
 
@@ -109,18 +135,18 @@ class SyncService extends Component
      */
     public function sync($sync_name, $filename = null)
     {
-        craft()->config->maxPowerCaptain();
+        App::maxPowerCaptain();
 
-        $this->config = craft()->config->get($sync_name, 'csvSync');
+        $this->config = Plugin::getInstance()->settings->syncs[$sync_name];
 
         if ($filename === null) {
             $filename = $this->config('filename');
             if ($filename[0] != '/') {
-                $filename = craft()->path->getStoragePath() . $filename;
+                $filename = Craft::$app->path->getStoragePath() . $filename;
             }
         }
 
-        $this->section = craft()->sections->getSectionByHandle($this->config('section'));
+        $this->section = Craft::$app->sections->getSectionByHandle($this->config('section'));
 
         if ($this->config('entry_type_id')) {
             $this->entry_type_id = $this->config('entry_type_id');
@@ -136,27 +162,25 @@ class SyncService extends Component
 
         while ($row = $this->getAssociativeRow()) {
 
-            $query = Entry::find()
-                ->section($this->section->id)
-                ->type($this->entry_type_id);
-
-            $entries = $this->config('find')($query, $row)->all();
-
-            if (count($entries)) {
-                $entry = current($entries);
-            } else {
-                $entry = $this->createEntry();
-            }
-
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
                 if (!is_callable($definition)) {
                     $attrs[$field] = $row[$definition];
                 }
             }
-            $entry->getContent()->setAttributes($attrs);
 
-            craft()->entries->saveEntry($entry);
+            $query = Entry::find()
+                ->section($this->section->handle)
+                ->typeId($this->entry_type_id);
+
+            $entry = $this->config('find')($query, $row)->one();
+
+            if ($entry) {
+                $this->updateEntry($entry, $attrs);
+            } else {
+                $entry = $this->createEntry($attrs);
+            }
+
         }
 
         rewind($this->file);
@@ -166,11 +190,11 @@ class SyncService extends Component
 
         while ($row = $this->getAssociativeRow()) {
             $query = Entry::find()
-                ->section($this->section->id)
-                ->type($this->entry_type_id);
+                ->section($this->section->handle)
+                ->typeId($this->entry_type_id);
             $entry = $this->config('find')($query, $row)->one();
 
-            if ($entry === false) {
+            if (!$entry) {
                 var_dump($entry, $row);
                 die('entry is false?');
             }
@@ -181,11 +205,8 @@ class SyncService extends Component
                     $attrs[$field] = $definition($row, $this);
                 }
             }
-            $entry->getContent()->setAttributes($attrs);
 
-            $entry->slug = $this->createSlug($entry);
-
-            craft()->entries->saveEntry($entry);
+            $this->updateEntry($entry, $attrs);
         }
     }
 }
