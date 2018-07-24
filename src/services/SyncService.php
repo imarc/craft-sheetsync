@@ -185,6 +185,10 @@ class SyncService extends Component
 
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
+                if (!isset($row[$definition])) {
+                    var_dump($row, $definition);
+                    die;
+                }
                 if (!is_callable($definition)) {
                     $attrs[$field] = $row[$definition];
                 }
@@ -204,10 +208,14 @@ class SyncService extends Component
 
         }
 
-        rewind($this->file);
+        $this->row_iterator->rewind();
 
         // skip the first row (headers)
-        $this->getRow();
+        if ($this->config('headers')) {
+            $this->config('headers')($this->row_iterator);
+        } else {
+            $this->getRow();
+        }
 
         while ($row = $this->getAssociativeRow()) {
             $query = Entry::find()
