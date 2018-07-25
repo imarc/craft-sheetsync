@@ -17,6 +17,7 @@ use craft\elements\Entry;
 use craft\helpers\App;
 use craft\helpers\ElementHelper;
 use imarc\csvsync\Plugin;
+use Exception;
 
 /**
  * SyncService Service
@@ -185,12 +186,12 @@ class SyncService extends Component
 
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
-                if (!isset($row[$definition])) {
-                    var_dump($row, $definition);
-                    die;
-                }
                 if (!is_callable($definition)) {
-                    $attrs[$field] = $row[$definition];
+                    if (isset($row[$definition])) {
+                        $attrs[$field] = $row[$definition];
+                    } else {
+                        throw new Exception("Couldn't find '$definition' in the import.");
+                    }
                 }
             }
 
