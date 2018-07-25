@@ -11,11 +11,13 @@
 namespace imarc\csvsync\services;
 
 use Craft;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use craft\base\Component;
 use craft\elements\Entry;
 use craft\helpers\App;
 use craft\helpers\ElementHelper;
 use imarc\csvsync\Plugin;
+use Exception;
 
 /**
  * SyncService Service
@@ -51,26 +53,27 @@ class SyncService extends Component
 
 
     protected $config = null;
-    protected $file = null;
+    protected $row_iterator = null;
     protected $headers = null;
 
     public $section = null;
     public $entry_type_id = null;
 
-    /**
-     * Fetches a single row from the CSV via fgetcsv().
-     */
     protected function getRow()
     {
-        $row = fgetcsv(
-            $this->file,
-            0,
-            $this->config('delimiter'),
-            $this->config('enclosure'),
-            $this->config('escape')
-        );
+        if (!$this->row_iterator->valid()) {
+            return null;
+        }
 
-        return is_array($row) ? array_map('trim', $row) : $row;
+        $row = $this->row_iterator->current();
+        $this->row_iterator->next();
+
+        $cells = [];
+        foreach ($row->getCellIterator() as $cell) {
+            $cells[] = $cell->getValue();
+        }
+
+        return array_map('trim', $cells);
     }
 
     /**
@@ -162,9 +165,18 @@ class SyncService extends Component
 
         Plugin::info("Running $sync_name with file $filename");
 
-        $this->file = fopen($filename, "r");
-        $this->headers = $this->getRow();
+        $file_reader = IOFactory::load($filename);
+        $file_reader = IOFactory::createReaderForFile($filename);
+        $file_reader->setReadDataOnly(true);
+        $worksheet = $file_reader->load($filename)->getActiveSheet();
+        $this->row_iterator = $worksheet->getRowIterator();
 
+
+        if ($this->config('headers')) {
+            $this->headers = $this->config('headers')($this->row_iterator);
+        } else {
+            $this->headers = $this->getRow();
+        }
 
         if (!$this->headers) {
             return "error";
@@ -175,7 +187,11 @@ class SyncService extends Component
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
                 if (!is_callable($definition)) {
-                    $attrs[$field] = $row[$definition];
+                    if (isset($row[$definition])) {
+                        $attrs[$field] = $row[$definition];
+                    } else {
+                        throw new Exception("Couldn't find '$definition' in the import.");
+                    }
                 }
             }
 
@@ -193,10 +209,14 @@ class SyncService extends Component
 
         }
 
-        rewind($this->file);
+        $this->row_iterator->rewind();
 
         // skip the first row (headers)
-        $this->getRow();
+        if ($this->config('headers')) {
+            $this->config('headers')($this->row_iterator);
+        } else {
+            $this->getRow();
+        }
 
         while ($row = $this->getAssociativeRow()) {
             $query = Entry::find()
