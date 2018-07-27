@@ -6,11 +6,11 @@
     From here, you can run any CSV sync that has been configured manually.
 </p>
 
-{% if craft.request.getParam('status') == 'success' %}
+{% if craft.app.request.getParam('status') == 'success' %}
     <p>
         Success! Synchronization ran successfully.
     </p>
-{% elseif craft.request.getParam('status') == 'error' %}
+{% elseif craft.app.request.getParam('status') == 'error' %}
     <p>
         Something went wrong trying to parse that file.
     </p>
