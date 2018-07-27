@@ -1,33 +1,33 @@
 <?php
 /**
- * CSV Sync plugin for Craft CMS 3.x
+ * Sheet Sync plugin for Craft CMS 3.x
  *
- * Allows you to import CSV files into Craft sections as entries.
+ * Allows you to import spreadsheet files into Craft sections as entries.
  *
  * @link      https://www.imarc.com/
  * @copyright Copyright (c) 2018 Kevin Hamer
  */
 
-namespace imarc\csvsync\utilities;
+namespace imarc\sheetsync\utilities;
 
-use imarc\csvsync\Plugin;
-use imarc\csvsync\assetbundles\csvsyncutilityutility\CsvSyncUtilityUtilityAsset;
+use imarc\sheetsync\Plugin;
+use imarc\sheetsync\assetbundles\sheetsyncutilityutility\SheetSyncUtilityUtilityAsset;
 
 use Craft;
 use craft\base\Utility;
 
 /**
- * CSV Sync Utility
+ * Sheet Sync Utility
  *
  * Utility is the base class for classes representing Control Panel utilities.
  *
  * https://craftcms.com/docs/plugins/utilities
  *
  * @author    Kevin Hamer
- * @package   CsvSync
+ * @package   SheetSync
  * @since     1.0.0
  */
-class CsvSyncUtility extends Utility
+class SheetSyncUtility extends Utility
 {
     // Static
     // =========================================================================
@@ -39,7 +39,7 @@ class CsvSyncUtility extends Utility
      */
     public static function displayName(): string
     {
-        return Craft::t('csv-sync', 'CSV Import');
+        return Craft::t('sheet-sync', 'Sheet Import');
     }
 
     /**
@@ -51,7 +51,7 @@ class CsvSyncUtility extends Utility
      */
     public static function id(): string
     {
-        return 'csvsync-csv-sync-utility';
+        return 'sheetsync-sheet-sync-utility';
     }
 
     /**
@@ -61,7 +61,7 @@ class CsvSyncUtility extends Utility
      */
     public static function iconPath()
     {
-        return Craft::getAlias("@imarc/csvsync/assetbundles/csvsyncutilityutility/dist/img/CsvSyncUtility-icon.svg");
+        return Craft::getAlias("@imarc/sheetsync/assetbundles/sheetsyncutilityutility/dist/img/SheetSyncUtility-icon.svg");
     }
 
     /**
@@ -83,10 +83,10 @@ class CsvSyncUtility extends Utility
      */
     public static function contentHtml(): string
     {
-        Craft::$app->getView()->registerAssetBundle(CsvSyncUtilityUtilityAsset::class);
+        Craft::$app->getView()->registerAssetBundle(SheetSyncUtilityUtilityAsset::class);
 
         return Craft::$app->getView()->renderTemplate(
-            'csv-sync/_components/utilities/CsvSyncUtility',
+            'sheet-sync/_components/utilities/SheetSyncUtility',
             [
                 'syncs' => Plugin::getInstance()->syncService->listSyncs(),
             ]

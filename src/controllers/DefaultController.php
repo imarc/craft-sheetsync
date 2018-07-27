@@ -1,18 +1,18 @@
 <?php
 /**
- * CSV Sync plugin for Craft CMS 3.x
+ * Sheet Sync plugin for Craft CMS 3.x
  *
- * Allows you to import CSV files into Craft sections as entries.
+ * Allows you to import spreadsheet files into Craft sections as entries.
  *
  * @link      https://www.imarc.com/
  * @copyright Copyright (c) 2018 Kevin Hamer
  */
 
-namespace imarc\csvsync\controllers;
+namespace imarc\sheetsync\controllers;
 
 use Craft;
 use craft\web\Controller;
-use imarc\csvsync\Plugin;
+use imarc\sheetsync\Plugin;
 use craft\web\UploadedFile;
 
 /**
@@ -32,7 +32,7 @@ use craft\web\UploadedFile;
  * https://craftcms.com/docs/plugins/controllers
  *
  * @author    Kevin Hamer
- * @package   CsvSync
+ * @package   SheetSync
  * @since     1.0.0
  */
 class DefaultController extends Controller
@@ -42,7 +42,7 @@ class DefaultController extends Controller
 
     /**
      * Handle a request going to our plugin's index action URL,
-     * e.g.: actions/csv-sync/default
+     * e.g.: actions/sheet-sync/default
      *
      * @return mixed
      */

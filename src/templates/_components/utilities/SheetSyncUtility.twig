@@ -1,9 +1,9 @@
 {% import "_includes/forms" as forms %}
 
-<h1>CSV Import</h1>
+<h1>Sheet Import</h1>
 
 <p>
-    From here, you can run any CSV sync that has been configured manually.
+    From here, you can run any spreadsheet sync that has been configured manually.
 </p>
 
 {% if craft.app.request.getParam('status') == 'success' %}
@@ -16,23 +16,23 @@
     </p>
 {% endif %}
 
-<form id="csv-import" class="utility" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
-    <input type="hidden" name="action" value="csv-sync/default/index">
+<form id="sheet-import" class="utility" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="sheet-sync/default/index">
     {{ csrfInput() }}
 
     {{ forms.selectfield({
-        label: "Select Sync"|t("csv-sync"),
+        label: "Select Sync"|t("sheet-sync"),
         name: "sync",
         options: syncs,
     }) }}
 
     {{ forms.fileField({
-        label: "Override CSV File"|t("csv-sync"),
+        label: "Override Spreadsheet"|t("sheet-sync"),
         name: "filename",
     }) }}
 
     <div class="buttons">
-        <input type="submit" class="btn submit" value="{{ "Run Sync"|t("csv-sync") }}" />
+        <input type="submit" class="btn submit" value="{{ "Run Sync"|t("sheet-sync") }}" />
         <div class="utility-status"></div>
     </div>
 </form>

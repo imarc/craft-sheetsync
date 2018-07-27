@@ -1,6 +1,6 @@
 <?php
 
-namespace imarc\csvsync\models;
+namespace imarc\sheetsync\models;
 
 use craft\base\Model;
 

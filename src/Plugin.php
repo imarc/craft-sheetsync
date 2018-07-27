@@ -1,19 +1,19 @@
 <?php
 /**
- * CSV Sync plugin for Craft CMS 3.x
+ * Sheet Sync plugin for Craft CMS 3.x
  *
- * Allows you to import CSV files into Craft sections as entries.
+ * Allows you to import Sheet files into Craft sections as entries.
  *
  * @link      https://www.imarc.com/
  * @copyright Copyright (c) 2018 Kevin Hamer
  */
 
-namespace imarc\csvsync;
+namespace imarc\sheetsync;
 
-use imarc\csvsync\services\SyncService as SyncServiceService;
-use imarc\csvsync\utilities\CsvSyncUtility as CsvSyncUtilityUtility;
-use imarc\csvsync\models\Settings;
-use imarc\csvsync\controllers\DefaultController;
+use imarc\sheetsync\services\SyncService as SyncServiceService;
+use imarc\sheetsync\utilities\SheetSyncUtility as SheetSyncUtilityUtility;
+use imarc\sheetsync\models\Settings;
+use imarc\sheetsync\controllers\DefaultController;
 
 use Craft;
 use craft\console\Application as ConsoleApplication;
@@ -33,7 +33,7 @@ use yii\base\Event;
  * https://craftcms.com/docs/plugins/introduction
  *
  * @author    Kevin Hamer
- * @package   CsvSync
+ * @package   SheetSync
  * @since     1.0.0
  *
  * @property  SyncServiceService $syncService
@@ -72,9 +72,9 @@ class Plugin extends \craft\base\Plugin
 
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
-            $this->controllerNamespace = 'imarc\csvsync\console\controllers';
+            $this->controllerNamespace = 'imarc\sheetsync\console\controllers';
         } else {
-            $this->controllerNamespace = 'imarc\csvsync\controllers';
+            $this->controllerNamespace = 'imarc\sheetsync\controllers';
         }
 
         // Register our utilities
@@ -82,13 +82,13 @@ class Plugin extends \craft\base\Plugin
             Utilities::class,
             Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function (RegisterComponentTypesEvent $event) {
-                $event->types[] = CsvSyncUtilityUtility::class;
+                $event->types[] = SheetSyncUtilityUtility::class;
             }
         );
 
         Craft::info(
             Craft::t(
-                'csv-sync',
+                'sheet-sync',
                 '{name} plugin loaded',
                 ['name' => $this->name]
             ),
@@ -98,17 +98,17 @@ class Plugin extends \craft\base\Plugin
 
     static public function info(...$params)
     {
-        Craft::info(sprintf(...$params), 'csv-sync');
+        Craft::info(sprintf(...$params), 'sheet-sync');
     }
 
     static public function warning(...$params)
     {
-        Craft::warning(sprintf(...$params), 'csv-sync');
+        Craft::warning(sprintf(...$params), 'sheet-sync');
     }
 
     static public function error(...$params)
     {
-        Craft::error(sprintf(...$params), 'csv-sync');
+        Craft::error(sprintf(...$params), 'sheet-sync');
     }
 
     // Protected Methods

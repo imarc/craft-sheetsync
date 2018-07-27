@@ -1,6 +1,6 @@
 {
-    "name": "imarc/craft-csvsync",
-    "description": "Allows you to import CSV files into Craft sections as entries.",
+    "name": "imarc/craft-sheetsync",
+    "description": "Allows you to import CSV, XLSX, and other spreadsheet files into Craft sections as entries.",
     "type": "craft-plugin",
     "version": "1.0.0",
     "keywords": [
@@ -9,6 +9,10 @@
         "craftcms",
         "craft-plugin",
         "csv",
+        "xls",
+        "xlsx",
+        "excel",
+        "spreadsheet",
         "import",
         "sync"
     ],
@@ -25,19 +29,19 @@
     },
     "autoload": {
         "psr-4": {
-          "imarc\\csvsync\\": "src/"
+          "imarc\\sheetsync\\": "src/"
         }
     },
     "extra": {
-        "name": "CSV Sync",
-        "handle": "csv-sync",
+        "name": "Sheet Sync",
+        "handle": "sheet-sync",
         "developer": "Imarc",
         "developerUrl": "https://www.imarc.com",
         "hasCpSettings": false,
         "hasCpSection": false,
         "components": {
-            "syncService": "imarc\\csvsync\\services\\SyncService"
+            "syncService": "imarc\\sheetsync\\services\\SyncService"
         },
-        "class": "imarc\\csvsync\\Plugin"
+        "class": "imarc\\sheetsync\\Plugin"
     }
 }

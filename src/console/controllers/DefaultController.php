@@ -1,26 +1,26 @@
 <?php
 /**
- * CSV Sync plugin for Craft CMS 3.x
+ * Sheet Sync plugin for Craft CMS 3.x
  *
- * Allows you to import CSV files into Craft sections as entries.
+ * Allows you to import spreadsheet files into Craft sections as entries.
  *
  * @link      https://www.imarc.com/
  * @copyright Copyright (c) 2018 Kevin Hamer
  */
 
-namespace imarc\csvsync\console\controllers;
+namespace imarc\sheetsync\console\controllers;
 
-use imarc\csvsync\Plugin;
+use imarc\sheetsync\Plugin;
 
 use Craft;
 use yii\console\Controller;
 use yii\helpers\Console;
 
 /**
- * imarc/craft-csvsync
+ * imarc/craft-sheetsync
  *
  * @author    Kevin Hamer
- * @package   CsvSync
+ * @package   SheetSync
  * @since     1.0.0
  */
 class DefaultController extends Controller
@@ -32,14 +32,14 @@ class DefaultController extends Controller
 
     /**
      * @var string
-     *     The name of the sync to run, as configured in config/csvsync.php.
+     *     The name of the sync to run, as configured in config/sheetsync.php.
      */
     public $name = null;
 
     /**
      * @var string
-     *     The path and filename of a CSV file to import. If not specified,
-     * uses the default filename configured in config/csvsync.php for the
+     *     The path and filename of a spreadsheet to import. If not specified,
+     * uses the default filename configured in config/sheetsync.php for the
      * current sync.
      */
     public $file = null;
@@ -63,7 +63,7 @@ class DefaultController extends Controller
     // =========================================================================
 
     /**
-     * Display help for imarc/craft-csvsync plugin.
+     * Display help for imarc/craft-sheetsync plugin.
      *
      */
     public function actionHelp()
@@ -72,8 +72,8 @@ class DefaultController extends Controller
         $d = "\033[0m";
         $version = Plugin::getInstance()->getVersion();
 
-        echo "CSV Sync - $version\n\n";
-        echo "    ${b}yiic csvsync --sync=NAME --file=FILENAME$d\n";
+        echo "Sheet Sync - $version\n\n";
+        echo "    ${b}yiic sheetsync --sync=NAME --file=FILENAME$d\n";
         echo "        Runs the sync NAME using the file FILENAME.\n\n";
     }
 

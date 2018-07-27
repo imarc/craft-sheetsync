@@ -1,14 +1,14 @@
 <?php
 /**
- * CSV Sync plugin for Craft CMS 3.x
+ * Sheet Sync plugin for Craft CMS 3.x
  *
- * Allows you to import CSV files into Craft sections as entries.
+ * Allows you to import spreadsheet files into Craft sections as entries.
  *
  * @link      https://www.imarc.com/
  * @copyright Copyright (c) 2018 Kevin Hamer
  */
 
-namespace imarc\csvsync\services;
+namespace imarc\sheetsync\services;
 
 use Craft;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -16,7 +16,7 @@ use craft\base\Component;
 use craft\elements\Entry;
 use craft\helpers\App;
 use craft\helpers\ElementHelper;
-use imarc\csvsync\Plugin;
+use imarc\sheetsync\Plugin;
 use Exception;
 
 /**
@@ -29,7 +29,7 @@ use Exception;
  * https://craftcms.com/docs/plugins/services
  *
  * @author    Kevin Hamer
- * @package   CsvSync
+ * @package   SheetSync
  * @since     1.0.0
  */
 class SyncService extends Component
@@ -77,7 +77,7 @@ class SyncService extends Component
     }
 
     /**
-     * Fetches an an associative array using the CSV header
+     * Fetches an an associative array using the spreadsheet header
      * label as columns, and the current row as the values.
      */
     protected function getAssociativeRow()
@@ -139,7 +139,7 @@ class SyncService extends Component
 
     /**
      * Main method. Called by the console command, this runs the sync from the
-     * CSV to the CMS section.
+     * spreadsheet to the CMS section.
      */
     public function sync($sync_name, $filename = null)
     {
