@@ -2,7 +2,6 @@
     "name": "imarc/craft-sheetsync",
     "description": "Allows you to import CSV, XLSX, and other spreadsheet files into Craft sections as entries.",
     "type": "craft-plugin",
-    "version": "1.0.0",
     "keywords": [
         "craft",
         "cms",
