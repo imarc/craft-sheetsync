@@ -3,6 +3,7 @@
 namespace imarc\sheetsync\models;
 
 use craft\base\Model;
+use imarc\sheetsync\services\Spreadsheet;
 
 class Settings extends Model
 {
@@ -11,4 +12,5 @@ class Settings extends Model
     public $enclosure = '"';
     public $escape    = '\\';
     public $syncs     = [];
+    public $reader    = Spreadsheet::class;
 }

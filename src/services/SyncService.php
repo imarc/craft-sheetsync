@@ -53,8 +53,7 @@ class SyncService extends Component
 
 
     protected $config = null;
-    protected $row_iterator = null;
-    protected $headers = null;
+    protected $reader = null;
 
     public $section = null;
     public $entry_type_id = null;
@@ -74,16 +73,6 @@ class SyncService extends Component
         }
 
         return array_map('trim', $cells);
-    }
-
-    /**
-     * Fetches an an associative array using the spreadsheet header
-     * label as columns, and the current row as the values.
-     */
-    protected function getAssociativeRow()
-    {
-        $row = $this->getRow();
-        return is_array($row) ? array_combine($this->headers, $row) : $row;
     }
 
     /**
@@ -165,24 +154,18 @@ class SyncService extends Component
 
         Plugin::info("Running $sync_name with file $filename");
 
-        $file_reader = IOFactory::load($filename);
-        $file_reader = IOFactory::createReaderForFile($filename);
-        $file_reader->setReadDataOnly(true);
-        $worksheet = $file_reader->load($filename)->getActiveSheet();
-        $this->row_iterator = $worksheet->getRowIterator();
-
+        $reader_class = $this->config('reader');
+        $this->reader = new $reader_class($filename);
 
         if ($this->config('headers')) {
-            $this->headers = $this->config('headers')($this->row_iterator);
+            $this->reader->setRowLabels(
+                $this->config('headers')($this->reader)
+            );
         } else {
-            $this->headers = $this->getRow();
+            $this->reader->setRowLabels($this->reader->getRow());
         }
 
-        if (!$this->headers) {
-            return "error";
-        }
-
-        while ($row = $this->getAssociativeRow()) {
+        while ($row = $this->reader->getAssociativeRow()) {
 
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
@@ -209,16 +192,16 @@ class SyncService extends Component
 
         }
 
-        $this->row_iterator->rewind();
+        $this->reader->rewind();
 
         // skip the first row (headers)
         if ($this->config('headers')) {
-            $this->config('headers')($this->row_iterator);
+            $this->config('headers')($this->reader);
         } else {
-            $this->getRow();
+            $this->reader->getRow();
         }
 
-        while ($row = $this->getAssociativeRow()) {
+        while ($row = $this->reader->getAssociativeRow()) {
             $query = Entry::find()
                 ->section($this->section->handle)
                 ->typeId($this->entry_type_id);
