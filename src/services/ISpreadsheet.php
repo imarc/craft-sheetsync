@@ -8,5 +8,5 @@ interface ISpreadSheet
     public function getRow();
     public function getAssociativeRow();
     public function rewind();
-    public function setRowLabels();
+    public function setRowLabels($labels);
 }
