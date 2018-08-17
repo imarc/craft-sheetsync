@@ -158,9 +158,11 @@ class SyncService extends Component
         $this->reader = new $reader_class($filename);
 
         if ($this->config('headers')) {
-            $this->reader->setRowLabels(
-                $this->config('headers')($this->reader)
-            );
+            $headers = $this->config('headers');
+            if (is_callable($headers)) {
+                $headers = $headers($this->reader);
+            }
+            $this->reader->setRowLabels($headers);
         } else {
             $this->reader->setRowLabels($this->reader->getRow());
         }
@@ -189,7 +191,6 @@ class SyncService extends Component
             } else {
                 $entry = $this->createEntry($attrs);
             }
-
         }
 
         $this->reader->rewind();
@@ -200,6 +201,8 @@ class SyncService extends Component
         } else {
             $this->reader->getRow();
         }
+
+        $used_keys = ['and'];
 
         while ($row = $this->reader->getAssociativeRow()) {
             $query = Entry::find()
@@ -215,7 +218,26 @@ class SyncService extends Component
             }
 
             $this->updateEntry($entry, $attrs);
+
+            if ($this->config('cleanUpOnKey')) {
+                $used_keys[] = 'not ' . $entry->{$this->config('cleanUpOnKey')};
+            }
         }
+
+        if ($this->config('cleanUpOnKey')) {
+            $query = Entry::find()
+                ->section($this->section->handle)
+                ->typeId($this->entry_type_id)
+                ->{$this->config('cleanUpOnKey')}(':notempty:')
+                ->{$this->config('cleanUpOnKey')}($used_keys)
+                ->limit(null);
+
+            foreach ($query->all() as $entry) {
+                Craft::$app->elements->deleteElement($entry);
+            }
+
+        }
+
 
         return "success";
     }
