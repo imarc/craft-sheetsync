@@ -39,7 +39,7 @@ class Spreadsheet implements ISpreadSheet
      * Fetches an an associative array using the spreadsheet header
      * label as columns, and the current row as the values.
      */
-    protected function getAssociativeRow()
+    public function getAssociativeRow()
     {
         $row = $this->getRow();
         return is_array($row) ? array_combine($this->labels, $row) : $row;
