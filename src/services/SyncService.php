@@ -224,7 +224,7 @@ class SyncService extends Component
             }
         }
 
-        if ($this->config('cleanUpOnKey')) {
+        if ($this->config('cleanUpOnKey') && count($used_keys)) {
             $query = Entry::find()
                 ->section($this->section->handle)
                 ->typeId($this->entry_type_id)
