@@ -90,6 +90,10 @@ class SyncService extends Component
             $entry->title = $attrs['title'];
             unset($attrs['title']);
         }
+        if (isset($attrs['enabled'])) {
+            $entry->enabled = $attrs['enabled'];
+            unset($attrs['enabled']);
+        }
         $entry->setFieldValues($attrs);
         $entry->slug = $this->createSlug($entry);
 
@@ -103,6 +107,10 @@ class SyncService extends Component
         if (isset($attrs['title'])) {
             $entry->title = $attrs['title'];
             unset($attrs['title']);
+        }
+        if (isset($attrs['enabled'])) {
+            $entry->enabled = $attrs['enabled'];
+            unset($attrs['enabled']);
         }
         $entry->setFieldValues($attrs);
         $entry->slug = $this->createSlug($entry);
