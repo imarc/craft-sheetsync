@@ -175,6 +175,8 @@ class SyncService extends Component
             $this->reader->setRowLabels($this->reader->getRow());
         }
 
+        $total_imported = 0;
+
         while ($row = $this->reader->getAssociativeRow()) {
 
             $attrs = [];
@@ -199,6 +201,8 @@ class SyncService extends Component
             } else {
                 $entry = $this->createEntry($attrs);
             }
+
+            $total_imported++;
         }
 
         $this->reader->rewind();
@@ -232,7 +236,7 @@ class SyncService extends Component
             }
         }
 
-        if ($this->config('cleanUpOnKey') && count($used_keys)) {
+        if ($this->config('cleanUpOnKey') && count($used_keys) && $total_imported > $this->config('minImport')) {
             $query = Entry::find()
                 ->section($this->section->handle)
                 ->typeId($this->entry_type_id)

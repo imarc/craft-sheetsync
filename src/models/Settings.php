@@ -12,5 +12,6 @@ class Settings extends Model
     public $enclosure = '"';
     public $escape    = '\\';
     public $syncs     = [];
+    public $minImport = 0;
     public $reader    = Spreadsheet::class;
 }

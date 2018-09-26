@@ -38,6 +38,7 @@ return [
 - **reader** (optional) - Allows you to override the class used to read the file. For example, you may want to set this to `\imarc\sheetsync\services\PlainCsv` to use the significantly more performance reader that just uses fgetcsv() instead of phpoffice/phpspreadsheet.
 - **headers** (optional) - Allows you override how headers for the sheet are determined. By default, the plugin will use the first row, but you can return a static array of headers, or you can write a function that takes the `$reader` as an argument and read in (and/or skip) multiple rows.
 - **cleanUpOnKey** (optional) - When set, will delete any entries with this key set that aren't in the current sheet.
+- **minImport** (default: 0) - Cleanup will only run if more than this number of entries were updated or created.
 
 #### Fields
 
