@@ -8,7 +8,7 @@
 
 {% if craft.app.request.getParam('status') == 'success' %}
     <p>
-        Success! Synchronization ran successfully.
+        The file has been queued for processing. This process can take as much as 10-15 minutes.
     </p>
 {% elseif craft.app.request.getParam('status') == 'error' %}
     <p>

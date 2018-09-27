@@ -12,8 +12,9 @@ namespace imarc\sheetsync\controllers;
 
 use Craft;
 use craft\web\Controller;
-use imarc\sheetsync\Plugin;
 use craft\web\UploadedFile;
+use imarc\sheetsync\Plugin;
+use imarc\sheetsync\jobs\RunSync;
 
 /**
  * Default Controller
@@ -52,13 +53,14 @@ class DefaultController extends Controller
         $upload = UploadedFile::getInstanceByName('filename');
         if ($upload) {
             $filename = $upload->tempName;
+            move_uploaded_file($filename, $filename);
         }
 
-        $status = Plugin::getInstance()->syncService->sync(
-            Craft::$app->request->getRequiredBodyParam('sync'),
-            $filename
-        );
+        Craft::$app->queue->push(new RunSync([
+            'sync' => Craft::$app->request->getRequiredBodyParam('sync'),
+            'filename' => $filename,
+        ]));
 
-        Craft::$app->response->redirect("?status=$status");
+        Craft::$app->response->redirect("?status=success");
     }
 }
