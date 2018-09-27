@@ -176,6 +176,7 @@ class SyncService extends Component
         }
 
         $total_imported = 0;
+        $used_keys = ['and'];
 
         while ($row = $this->reader->getAssociativeRow()) {
 
@@ -190,11 +191,26 @@ class SyncService extends Component
                 }
             }
 
+            foreach ($this->config('fields') as $field => $definition) {
+                if (is_callable($definition)) {
+                    $attrs[$field] = $definition($row, $this);
+                }
+            }
             $query = Entry::find()
                 ->section($this->section->handle)
-                ->typeId($this->entry_type_id);
+                ->typeId($this->entry_type_id)
+                ->status(null);
 
-            $entry = $this->config('find')($query, $row)->one();
+            $query = $this->config('find')($query, $row);
+
+            if ($query->count() > 1) {
+                foreach ($query->all() as $old_entry) {
+                    Craft::$app->elements->deleteElement($old_entry);
+                }
+                $entry = null;
+            } else {
+                $entry = $query->one();
+            }
 
             if ($entry) {
                 $this->updateEntry($entry, $attrs);
@@ -202,38 +218,11 @@ class SyncService extends Component
                 $entry = $this->createEntry($attrs);
             }
 
-            $total_imported++;
-        }
-
-        $this->reader->rewind();
-
-        // skip the first row (headers)
-        if ($this->config('headers')) {
-            $this->config('headers')($this->reader);
-        } else {
-            $this->reader->getRow();
-        }
-
-        $used_keys = ['and'];
-
-        while ($row = $this->reader->getAssociativeRow()) {
-            $query = Entry::find()
-                ->section($this->section->handle)
-                ->typeId($this->entry_type_id);
-            $entry = $this->config('find')($query, $row)->one();
-
-            $attrs = [];
-            foreach ($this->config('fields') as $field => $definition) {
-                if (is_callable($definition)) {
-                    $attrs[$field] = $definition($row, $this);
-                }
-            }
-
-            $this->updateEntry($entry, $attrs);
 
             if ($this->config('cleanUpOnKey')) {
                 $used_keys[] = 'not ' . $entry->{$this->config('cleanUpOnKey')};
             }
+            $total_imported++;
         }
 
         if ($this->config('cleanUpOnKey') && count($used_keys) && $total_imported > $this->config('minImport')) {
