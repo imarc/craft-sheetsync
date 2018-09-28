@@ -138,7 +138,7 @@ class SyncService extends Component
      * Main method. Called by the console command, this runs the sync from the
      * spreadsheet to the CMS section.
      */
-    public function sync($sync_name, $filename = null)
+    public function sync($sync_name, $filename = null, $queue = null)
     {
         App::maxPowerCaptain();
 
@@ -177,6 +177,7 @@ class SyncService extends Component
 
         $total_imported = 0;
         $used_keys = ['and'];
+        $num_rows = $this->reader->countRows();
 
         while ($row = $this->reader->getAssociativeRow()) {
 
@@ -223,6 +224,7 @@ class SyncService extends Component
                 $used_keys[] = 'not ' . $entry->{$this->config('cleanUpOnKey')};
             }
             $total_imported++;
+            $queue->setProgress(round(100 * $total_imported / $num_rows));
         }
 
         if ($this->config('cleanUpOnKey') && count($used_keys) && $total_imported > $this->config('minImport')) {

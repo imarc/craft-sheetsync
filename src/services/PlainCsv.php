@@ -4,12 +4,19 @@ namespace imarc\sheetsync\services;
 
 class PlainCsv implements ISpreadSheet
 {
+    private $filename = null;
     private $file = null;
     private $labels = null;
 
     public function __construct($filename)
     {
+        $this->filename = $filename;
         $this->file = fopen($filename, 'r');
+    }
+
+    public function countRows()
+    {
+        return count(file($this->filename));
     }
 
     public function getRow()

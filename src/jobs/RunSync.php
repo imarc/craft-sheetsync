@@ -19,7 +19,8 @@ class RunSync extends BaseJob
     {
         $status = Plugin::getInstance()->syncService->sync(
             $this->sync,
-            $this->filename
+            $this->filename,
+            $queue
         );
 
         return $status;
