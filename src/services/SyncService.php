@@ -224,7 +224,9 @@ class SyncService extends Component
                 $used_keys[] = 'not ' . $entry->{$this->config('cleanUpOnKey')};
             }
             $total_imported++;
-            $queue->setProgress(round(100 * $total_imported / $num_rows));
+            if ($queue) {
+                $queue->setProgress(round(100 * $total_imported / $num_rows));
+            }
         }
 
         if ($this->config('cleanUpOnKey') && count($used_keys) && $total_imported > $this->config('minImport')) {

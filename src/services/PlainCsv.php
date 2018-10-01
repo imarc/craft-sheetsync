@@ -21,7 +21,13 @@ class PlainCsv implements ISpreadSheet
 
     public function getRow()
     {
-        return fgetcsv($this->file);
+        $row = fgetcsv($this->file);
+
+        if (is_array($row) && count($row) <= 1) {
+            return $this->getRow();
+        }
+
+        return $row;
     }
 
     /**
@@ -31,6 +37,9 @@ class PlainCsv implements ISpreadSheet
     public function getAssociativeRow()
     {
         $row = $this->getRow();
+        if (is_array($row) && count($this->labels) != count($row)) {
+            throw new \exception("row and labels don't match: " . print_r([$this->labels, $row], true));
+        }
         return is_array($row) ? array_combine($this->labels, $row) : $row;
     }
 
