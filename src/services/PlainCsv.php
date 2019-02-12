@@ -12,6 +12,20 @@ class PlainCsv implements ISpreadSheet
     {
         $this->filename = $filename;
         $this->file = fopen($filename, 'r');
+        $this->skipByteOrderMark();
+    }
+
+    /**
+     * These lines look for and skip over a byte order mark (<FEFF>) if it's
+     * lurking within the CSV file, looking for an opportunity to crush your
+     * soul.
+     */
+    private function skipByteOrderMark()
+    {
+        $byte_order_mark = fread($this->file, 3);
+        if ($byte_order_mark != pack('H*', 'EFBBBF')) {
+            rewind($this->file);
+        }
     }
 
     public function countRows()
@@ -51,5 +65,6 @@ class PlainCsv implements ISpreadSheet
     public function rewind()
     {
         rewind($this->file);
+        $this->skipByteOrderMark();
     }
 }
