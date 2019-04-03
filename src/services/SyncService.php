@@ -78,7 +78,7 @@ class SyncService extends Component
     /**
      * Creates a new entry.
      */
-    protected function createEntry($attrs)
+    protected function createEntry($attrs, $siteId=null)
     {
         $entry = new Entry();
         $entry->authorId = $this->config('authorId');
@@ -94,6 +94,11 @@ class SyncService extends Component
             $entry->enabled = $attrs['enabled'];
             unset($attrs['enabled']);
         }
+        if ($siteId || isset($attrs['siteId'])) {
+            $entry->siteId = $siteId ?: $attrs['siteId'];
+            unset($attrs['siteId']);
+        }
+
         $entry->setFieldValues($attrs);
         $entry->slug = $this->createSlug($entry);
 
@@ -102,7 +107,7 @@ class SyncService extends Component
         return $entry;
     }
 
-    protected function updateEntry($entry, $attrs)
+    protected function updateEntry($entry, $attrs, $siteId=null)
     {
         if (isset($attrs['title'])) {
             $entry->title = $attrs['title'];
@@ -112,12 +117,40 @@ class SyncService extends Component
             $entry->enabled = $attrs['enabled'];
             unset($attrs['enabled']);
         }
+        if ($siteId || isset($attrs['siteId'])) {
+            $entry->siteId = $siteId ?: $attrs['siteId'];
+            unset($attrs['siteId']);
+        }
+
         $entry->setFieldValues($attrs);
         $entry->slug = $this->createSlug($entry);
 
         Craft::$app->elements->saveElement($entry);
 
         return $entry;
+    }
+
+    protected function findExisting($row, $attrs, $siteId=null)
+    {
+        $query = Entry::find()
+            ->section($this->section->handle)
+            ->typeId($this->entry_type_id)
+            ->status(null);
+
+        if ($siteId) {
+            $query = $query->siteId($siteId);
+        }
+
+        $query = $this->config('find')($query, $row);
+
+        if ($query->count() > 1) {
+            foreach ($query->all() as $old_entry) {
+                Craft::$app->elements->deleteElement($old_entry);
+            }
+            return null;
+        } else {
+            return $query->one();
+        }
     }
 
     /**
@@ -197,26 +230,25 @@ class SyncService extends Component
                     $attrs[$field] = $definition($row, $this);
                 }
             }
-            $query = Entry::find()
-                ->section($this->section->handle)
-                ->typeId($this->entry_type_id)
-                ->status(null);
 
-            $query = $this->config('find')($query, $row);
+            if (isset($attrs['siteId']) && is_array($attrs['siteId'])) {
+                foreach ($attrs['siteId'] as $siteId) {
+                    $entry = $this->findExisting($row, $attrs, $siteId);
 
-            if ($query->count() > 1) {
-                foreach ($query->all() as $old_entry) {
-                    Craft::$app->elements->deleteElement($old_entry);
+                    if ($entry) {
+                        $this->updateEntry($entry, $attrs, $siteId);
+                    } else {
+                        $entry = $this->createEntry($attrs, $siteId);
+                    }
                 }
-                $entry = null;
             } else {
-                $entry = $query->one();
-            }
+                $entry = $this->findExisting($row, $attrs);
 
-            if ($entry) {
-                $this->updateEntry($entry, $attrs);
-            } else {
-                $entry = $this->createEntry($attrs);
+                if ($entry) {
+                    $this->updateEntry($entry, $attrs);
+                } else {
+                    $entry = $this->createEntry($attrs);
+                }
             }
 
 
