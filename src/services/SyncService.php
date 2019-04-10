@@ -86,6 +86,10 @@ class SyncService extends Component
         $entry->typeId = $this->entry_type_id;
         $entry->enabled = true;
 
+        if (isset($attrs['id'])) {
+            $entry->id = $attrs['id'];
+            unset($attrs['id']);
+        }
         if (isset($attrs['title'])) {
             $entry->title = $attrs['title'];
             unset($attrs['title']);
@@ -95,6 +99,7 @@ class SyncService extends Component
             unset($attrs['enabled']);
         }
         if ($siteId || isset($attrs['siteId'])) {
+            $entry->enabledForSite = true;
             $entry->siteId = $siteId ?: $attrs['siteId'];
             unset($attrs['siteId']);
         }
@@ -118,6 +123,7 @@ class SyncService extends Component
             unset($attrs['enabled']);
         }
         if ($siteId || isset($attrs['siteId'])) {
+            $entry->enabledForSite = true;
             $entry->siteId = $siteId ?: $attrs['siteId'];
             unset($attrs['siteId']);
         }
@@ -134,23 +140,16 @@ class SyncService extends Component
     {
         $query = Entry::find()
             ->section($this->section->handle)
-            ->typeId($this->entry_type_id)
-            ->status(null);
-
-        if ($siteId) {
-            $query = $query->siteId($siteId);
-        }
+            ->anyStatus()
+            ->siteId($siteId);
 
         $query = $this->config('find')($query, $row);
 
-        if ($query->count() > 1) {
-            foreach ($query->all() as $old_entry) {
-                Craft::$app->elements->deleteElement($old_entry);
-            }
-            return null;
-        } else {
+        if ($query->count()) {
             return $query->one();
         }
+
+        return null;
     }
 
     /**
@@ -232,13 +231,25 @@ class SyncService extends Component
             }
 
             if (isset($attrs['siteId']) && is_array($attrs['siteId'])) {
+
+                $entry = null;
+                $lastEntry = null;
+
                 foreach ($attrs['siteId'] as $siteId) {
-                    $entry = $this->findExisting($row, $attrs, $siteId);
+
+                    if ($lastEntry) {
+                        $entry = Entry::find()->id($lastEntry->id)->siteId($siteId)->anyStatus()->one();
+                    } else {
+                        $entry = $this->findExisting($row, $attrs, $siteId);
+                    }
 
                     if ($entry) {
                         $this->updateEntry($entry, $attrs, $siteId);
+
                     } else {
-                        $entry = $this->createEntry($attrs, $siteId);
+                        // If we haven't created any Entry at all yet, create one
+                        $entry = $lastEntry = $this->createEntry($attrs, $siteId);
+                        Plugin::info("Created Entry: " . $lastEntry->id);
                     }
                 }
             } else {
@@ -251,10 +262,10 @@ class SyncService extends Component
                 }
             }
 
-
             if ($this->config('cleanUpOnKey')) {
                 $used_keys[] = 'not ' . $entry->{$this->config('cleanUpOnKey')};
             }
+
             $total_imported++;
             if ($queue) {
                 $queue->setProgress(round(100 * $total_imported / $num_rows));
