@@ -262,6 +262,10 @@ class SyncService extends Component
                 }
             }
 
+            if (!$entry) {
+                continue;
+            }
+
             if ($this->config('cleanUpOnKey')) {
                 $used_keys[] = 'not ' . $entry->{$this->config('cleanUpOnKey')};
             }
