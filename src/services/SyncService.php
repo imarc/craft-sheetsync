@@ -131,7 +131,13 @@ class SyncService extends Component
         $entry->setFieldValues($attrs);
         $entry->slug = $this->createSlug($entry);
 
-        Craft::$app->elements->saveElement($entry);
+        try {
+            Craft::$app->elements->saveElement($entry);
+        } catch (\Exception $e) {
+            Craft::error(print_r($attrs, true), 'sheet-sync');
+            Plugin::error("Error with row");
+            throw $e;
+        }
 
         return $entry;
     }
@@ -162,7 +168,8 @@ class SyncService extends Component
         if (is_callable($this->config('slug'))) {
             return ($this->config('slug'))($entry);
         } else {
-            return ElementHelper::createSlug($entry->{$this->config('slug')});
+            $slug = filter_var($entry->{$this->config('slug')}, FILTER_DEFAULT, FILTER_FLAG_STRIP_HIGH);
+            return ElementHelper::createSlug($slug);
         }
     }
 
@@ -229,6 +236,14 @@ class SyncService extends Component
                     $attrs[$field] = $definition($row, $this);
                 }
             }
+
+            $attrs = array_map(function($val) {
+                if (is_string($val)) {
+                    return \ForceUTF8\Encoding::toUTF8($val);
+                } else {
+                    return $val;
+                }
+            }, $attrs);
 
             if (isset($attrs['siteId']) && is_array($attrs['siteId'])) {
 
