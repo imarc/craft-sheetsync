@@ -23,6 +23,9 @@ class RunSync extends BaseJob
             $queue
         );
 
+        // Clean up file on success
+        unlink($this->filename);
+
         return $status;
     }
 }

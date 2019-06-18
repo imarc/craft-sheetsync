@@ -53,12 +53,13 @@ class DefaultController extends Controller
         $upload = UploadedFile::getInstanceByName('filename');
         if ($upload) {
             $filename = $upload->tempName;
-            move_uploaded_file($filename, $filename);
+            $new_filename = Craft::$app->path->getStoragePath() . $filename;
+            move_uploaded_file($filename, $new_filename);
         }
 
         Craft::$app->queue->push(new RunSync([
             'sync' => Craft::$app->request->getRequiredBodyParam('sync'),
-            'filename' => $filename,
+            'filename' => $new_filename,
         ]));
 
         Craft::$app->response->redirect("?status=success");
