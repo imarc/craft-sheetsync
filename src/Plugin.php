@@ -96,6 +96,11 @@ class Plugin extends \craft\base\Plugin
         );
     }
 
+    static public function debug(...$params)
+    {
+        Craft::debug(sprintf(...$params), 'sheet-sync');
+    }
+
     static public function info(...$params)
     {
         Craft::info(sprintf(...$params), 'sheet-sync');

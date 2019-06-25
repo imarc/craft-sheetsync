@@ -217,8 +217,11 @@ class SyncService extends Component
         $total_imported = 0;
         $used_keys = ['and'];
         $num_rows = $this->reader->countRows();
+        Plugin::info("Processing $num_rows rows.");
 
         while ($row = $this->reader->getAssociativeRow()) {
+
+            Plugin::debug("Row: " . json_encode($row));
 
             $attrs = [];
             foreach ($this->config('fields') as $field => $definition) {
@@ -245,10 +248,16 @@ class SyncService extends Component
                 }
             }, $attrs);
 
+            Plugin::debug("Attrs: " . json_encode($attrs));
+
             if (isset($attrs['siteId']) && is_array($attrs['siteId'])) {
 
                 $entry = null;
                 $lastEntry = null;
+
+                if (count($attrs['siteId']) == 0) {
+                    Plugin::warning("No enabled sites for row: " . json_encode($attrs));
+                }
 
                 foreach ($attrs['siteId'] as $siteId) {
 
@@ -260,6 +269,7 @@ class SyncService extends Component
 
                     if ($entry) {
                         $this->updateEntry($entry, $attrs, $siteId);
+                        Plugin::info("Updated Entry: " . $entry->id);
 
                     } else {
                         // If we haven't created any Entry at all yet, create one
@@ -272,8 +282,10 @@ class SyncService extends Component
 
                 if ($entry) {
                     $this->updateEntry($entry, $attrs);
+                    Plugin::info("Updated Entry: " . $entry->id);
                 } else {
                     $entry = $this->createEntry($attrs);
+                    Plugin::info("Created Entry: " . $entry->id);
                 }
             }
 
