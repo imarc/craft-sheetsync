@@ -3,11 +3,6 @@ CSV Sync plugin for Craft CMS 3.x
 
 Allows you to import/sync spreadsheet files into Craft sections as entries.
 
-Work in Progress
-----------------
-
-This plugin is under significant development still, although it is functional.
-
 
 Configuration
 -------------
@@ -66,8 +61,39 @@ Fields are configured as an associative array. The key should be the name of a C
     // ...
 ```
 
+##### Builtin Fields
+
+You can also overwrite all of the following builtin fields. Under most circumstances, you'll only set `id` and `title`. It's important to note that for date fields, Craft expects an instance of `DateTime` and not just a numeric timestamp or string.
+
+* authorId - integer
+* dateCreated - DateTime
+* dateUpdated - DateTime
+* enabled - boolean
+* enabledForSite - boolean - normally this is set automatically when you provide `siteId` values
+* expiryDate - DateTime
+* id - integer
+* postDate - DateTime
+* revisionNotes - string
+* slug - string
+* title - string
+
+Here's an example of what you might put in your config/sheet-sync.php file to deal with a date field:
+
+```
+    'expiryDate' => function($row) {
+        return new DateTime($row['expiration']);
+    },
+```
+It's handy to remember that `DateTime`'s constructor can handle all kinds of strings too, such as 'next month', '+90 days', etc.
+
+
 Usage
 -----
+
+The most common way to use this is to access if via the Craft Control Panel under Utilities, Sheet Import. From there, you can select the name of the sync you'd like to run and (optionally) upload a CSV file.
+
+
+### Via Command Line
 
 To run a sync, you call it via yiic:
 

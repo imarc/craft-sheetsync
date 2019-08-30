@@ -36,16 +36,16 @@ class SyncService extends Component
 {
     const ENTRY_ATTRIBUTES = [
         'authorId',
-        'postDate',
-        'expiryDate',
-        'id',
-        'title',
-        'enabled',
-        'revisionNotes',
-        'enabledForSite',
-        'slug',
         'dateCreated',
         'dateUpdated',
+        'enabled',
+        'enabledForSite',
+        'expiryDate',
+        'id',
+        'postDate',
+        'revisionNotes',
+        'slug',
+        'title',
     ];
 
     static public function listSyncs()
