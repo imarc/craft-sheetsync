@@ -34,6 +34,20 @@ use Exception;
  */
 class SyncService extends Component
 {
+    const ENTRY_ATTRIBUTES = [
+        'authorId',
+        'postDate',
+        'expiryDate',
+        'id',
+        'title',
+        'enabled',
+        'revisionNotes',
+        'enabledForSite',
+        'slug',
+        'dateCreated',
+        'dateUpdated',
+    ];
+
     static public function listSyncs()
     {
         $syncs = array_keys(Plugin::getInstance()->settings->syncs);
@@ -86,22 +100,17 @@ class SyncService extends Component
         $entry->typeId = $this->entry_type_id;
         $entry->enabled = true;
 
-        if (isset($attrs['id'])) {
-            $entry->id = $attrs['id'];
-            unset($attrs['id']);
-        }
-        if (isset($attrs['title'])) {
-            $entry->title = $attrs['title'];
-            unset($attrs['title']);
-        }
-        if (isset($attrs['enabled'])) {
-            $entry->enabled = $attrs['enabled'];
-            unset($attrs['enabled']);
-        }
         if ($siteId || isset($attrs['siteId'])) {
             $entry->enabledForSite = true;
             $entry->siteId = $siteId ?: $attrs['siteId'];
             unset($attrs['siteId']);
+        }
+
+        foreach (static::ENTRY_ATTRIBUTES as $attr) {
+            if (isset($attrs[$attr])) {
+                $entry->{$attr} = $attrs[$attr];
+                unset($attrs[$attr]);
+            }
         }
 
         $entry->setFieldValues($attrs);
@@ -114,18 +123,17 @@ class SyncService extends Component
 
     protected function updateEntry($entry, $attrs, $siteId=null)
     {
-        if (isset($attrs['title'])) {
-            $entry->title = $attrs['title'];
-            unset($attrs['title']);
-        }
-        if (isset($attrs['enabled'])) {
-            $entry->enabled = $attrs['enabled'];
-            unset($attrs['enabled']);
-        }
         if ($siteId || isset($attrs['siteId'])) {
             $entry->enabledForSite = true;
             $entry->siteId = $siteId ?: $attrs['siteId'];
             unset($attrs['siteId']);
+        }
+
+        foreach (static::ENTRY_ATTRIBUTES as $attr) {
+            if (isset($attrs[$attr])) {
+                $entry->{$attr} = $attrs[$attr];
+                unset($attrs[$attr]);
+            }
         }
 
         $entry->setFieldValues($attrs);
