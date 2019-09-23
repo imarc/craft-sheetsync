@@ -53,7 +53,7 @@ class DefaultController extends Controller
         $upload = UploadedFile::getInstanceByName('filename');
         if ($upload) {
             $filename = $upload->tempName;
-            $new_filename = Craft::$app->path->getStoragePath() . basename($filename) . '.upload';
+            $new_filename = Craft::$app->path->getStoragePath() . '/' . basename($filename) . '.upload';
             move_uploaded_file($filename, $new_filename);
         }
 
