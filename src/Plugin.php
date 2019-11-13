@@ -98,22 +98,56 @@ class Plugin extends \craft\base\Plugin
 
     static public function debug(...$params)
     {
-        Craft::debug(sprintf(...$params), 'sheet-sync');
+		try {
+			foreach ($params as &$param) {
+				$param = str_replace("%"," ",$param);
+			}
+			
+			Craft::debug(sprintf(...$params), 'sheet-sync');
+		}
+		catch (exception $e) {
+			Craft::error('Sheet Sync Debug Error: ' . $e->getMessage(), 'sheet-sync');
+		}
     }
 
     static public function info(...$params)
     {
-        Craft::info(sprintf(...$params), 'sheet-sync');
+		try {
+			foreach ($params as &$param) {
+				$param = str_replace("%"," ",$param);
+			}
+			Craft::info(sprintf(...$params), 'sheet-sync');
+		}
+		catch (exception $e) {
+			Craft::error('Sheet Sync Info Error: ' . $e->getMessage(), 'sheet-sync');
+		}
+
     }
 
     static public function warning(...$params)
     {
-        Craft::warning(sprintf(...$params), 'sheet-sync');
+	 	try {
+			foreach ($params as &$param) {
+				$param = str_replace("%"," ",$param);
+			}
+			Craft::warning(sprintf(...$params), 'sheet-sync');
+		}
+		catch (exception $e) {
+			Craft::error('Sheet Sync warning Error: ' . $e->getMessage(), 'sheet-sync');
+		}
     }
 
     static public function error(...$params)
     {
-        Craft::error(sprintf(...$params), 'sheet-sync');
+	 	try {
+			foreach ($params as &$param) {
+				$param = str_replace("%"," ",$param);
+			}
+			Craft::error(sprintf(...$params), 'sheet-sync');
+		}
+		catch (exception $e) {
+			Craft::error('Sheet Sync error Error: ' . $e->getMessage(), 'sheet-sync');
+		}
     }
 
     // Protected Methods
