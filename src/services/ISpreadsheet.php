@@ -2,7 +2,7 @@
 
 namespace imarc\sheetsync\services;
 
-interface ISpreadSheet
+interface ISpreadsheet
 {
     public function __construct($filename);
     public function getRow();

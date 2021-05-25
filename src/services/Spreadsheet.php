@@ -4,7 +4,7 @@ namespace imarc\sheetsync\services;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class Spreadsheet implements ISpreadSheet
+class Spreadsheet implements ISpreadsheet
 {
     private $row_iterator = null;
     private $labels = null;
