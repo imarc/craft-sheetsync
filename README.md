@@ -95,14 +95,14 @@ The most common way to use this is to access if via the Craft Control Panel unde
 
 ### Via Command Line
 
-To run a sync, you call it via yiic:
+To run a sync, first navigate to the folder in /var/www/ that has craft. Then 
 
 ```
-$ php craft/app/etc/console/yiic  --sync=name-of-a-sync
+$ php craft sheet-sync/default/sync --name='name-of-a-sync'
 ```
 
 You can optionally specify a specific file to use:
 
 ```
-$ php craft/app/etc/console/yiic sheetsync --sync=name-of-a-sync --file=path/to/file
+$ php craft sheet-sync/default/sync --name='name-of-a-sync' --file=path/to/file
 ```

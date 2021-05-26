@@ -2,7 +2,7 @@
 
 namespace imarc\sheetsync\services;
 
-class PlainCsv implements ISpreadSheet
+class PlainCsv implements ISpreadsheet
 {
     private $filename = null;
     private $file = null;
